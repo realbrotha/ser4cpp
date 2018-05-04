@@ -58,7 +58,7 @@ bool TestFloatParsing(std::string expected_hex, typename T::type_t value)
 
 TEST_CASE(SUITE("Float memory byte order is IEEE 754"))
 {
-    REQUIRE(ser4cpp::FloatByteOrder::get_byte_order() != FloatByteOrder::Value::unsupported);
+    REQUIRE(ser4cpp::FloatByteOrder::order() != FloatByteOrder::Value::unsupported);
 }
 
 TEST_CASE(SUITE("DoubleFloatSerialization"))

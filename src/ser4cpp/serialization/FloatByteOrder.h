@@ -41,7 +41,20 @@ public:
         reverse,
         unsupported
     };
-    
+
+    static Value order()
+    {
+        static Value order = get_byte_order();
+        return order;
+    }
+
+private:
+    union FloatUnion
+    {
+        uint8_t bytes[4];
+        float f;
+    };
+
     static Value get_byte_order()
     {
         if (is_normal_byte_order())
@@ -57,13 +70,6 @@ public:
             return FloatByteOrder::Value::unsupported;
         }
     }
-
-private:
-    union FloatUnion
-    {
-        uint8_t bytes[4];
-        float f;
-    };
 
     static bool is_normal_byte_order()
     {

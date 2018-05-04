@@ -74,7 +74,7 @@ private:
 
     static double read(const uint8_t* data)
     {
-        if (FloatByteOrder::get_byte_order() == FloatByteOrder::Value::normal)
+        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
         {
             DoubleFloatUnion x = {{ data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7] }};
             return x.value;
@@ -88,7 +88,7 @@ private:
 
     static void write(uint8_t* dest, double value)
     {
-        if (FloatByteOrder::get_byte_order() == FloatByteOrder::Value::normal)
+        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
         {
             memcpy(dest, &value, size);
         }

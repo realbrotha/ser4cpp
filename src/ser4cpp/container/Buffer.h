@@ -46,6 +46,9 @@ public:
         bytes(std::make_unique<uint8_t[]>(length))
     {}
 
+    Buffer(Buffer&&) noexcept = default;
+    Buffer& operator=(Buffer&&) noexcept = default;
+
     // initialize with the exact length and contents
     explicit Buffer(const rseq_t& input) : Buffer(input.length())
     {

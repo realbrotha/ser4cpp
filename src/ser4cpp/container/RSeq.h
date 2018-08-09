@@ -60,7 +60,7 @@ public:
     void make_empty()
     {
         this->buffer_ = nullptr;
-        this->length_ = 0;
+        this->m_length = 0;
     }
 
     RSeq take(L count) const

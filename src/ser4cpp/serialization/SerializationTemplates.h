@@ -31,6 +31,13 @@
 #include <cstdint>
 #include <cstring>
 
+// On linux (at least Ubuntu 18.10), termios defines B0
+// as a bitrate constant, making the templates compilation
+// crash. For now, we just undef it.
+#ifdef B0
+#undef B0
+#endif
+
 namespace ser4cpp
 {
 

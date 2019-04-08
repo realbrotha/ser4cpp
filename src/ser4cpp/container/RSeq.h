@@ -32,6 +32,9 @@
 #include <cstdint>
 #include <cstring>
 
+/**
+* @brief ser4cpp header-only library namespace
+*/
 namespace ser4cpp
 {
 

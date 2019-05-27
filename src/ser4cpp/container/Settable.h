@@ -32,16 +32,16 @@ namespace ser4cpp
 template<class T> class Settable
 {
 public:
-    Settable() : valueIsSet(false) {}
+    Settable() : value_is_set(false) {}
 
     bool is_set() const
     {
-        return valueIsSet;
+        return value_is_set;
     }
 
     bool is_empty() const
     {
-        return !valueIsSet;
+        return !value_is_set;
     }
 
     T get() const
@@ -53,7 +53,7 @@ public:
     {
         if (valueIsSet)
         {
-            valueIsSet = false;
+            value_is_set = false;
             output = value;
             return true;
         }
@@ -65,13 +65,13 @@ public:
 
     void clear()
     {
-        valueIsSet = false;
+        value_is_set = false;
     }
 
     void set(const T& value_)
     {
         value = value_;
-        valueIsSet = true;
+        value_is_set = true;
     }
 
 private:

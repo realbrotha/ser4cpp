@@ -38,7 +38,7 @@ public:
     typedef bool (*ReadFunc)(rseq_t& buffer, T& output);
     typedef bool (*WriteFunc)(const T& value, wseq_t& buffer);
 
-    Serializer() : size(0), pReadFunc(nullptr), pWriteFunc(nullptr) {}
+    Serializer() : _size(0), pReadFunc(nullptr), pWriteFunc(nullptr) {}
 
     Serializer(uint32_t size, ReadFunc pReadFunc, WriteFunc pWriteFunc)
         : _size(size), pReadFunc(pReadFunc), pWriteFunc(pWriteFunc)

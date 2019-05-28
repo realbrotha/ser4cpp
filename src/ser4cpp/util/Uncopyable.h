@@ -34,8 +34,10 @@ namespace ser4cpp
 class Uncopyable
 {
 protected:
-    Uncopyable() {} //allow construction/destruction
-    ~Uncopyable() {}
+    Uncopyable() = default; //allow construction/destruction/move
+    Uncopyable(Uncopyable&&) = default;
+    virtual ~Uncopyable() = default;
+    Uncopyable& operator=(Uncopyable&&) = default;
 
 private:
     // prevent these functions

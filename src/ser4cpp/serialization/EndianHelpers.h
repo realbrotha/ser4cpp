@@ -25,13 +25,15 @@
 #ifndef SER4CPP_ENDIANHELPERS_H
 #define SER4CPP_ENDIANHELPERS_H
 
+#include "ser4cpp/serialization/DoubleFloat.h"
 #include "ser4cpp/serialization/SerializationTemplates.h"
+#include "ser4cpp/serialization/SingleFloat.h"
 #include "ser4cpp/util/Uncopyable.h"
 
 namespace ser4cpp
 {
 
-template <class Int16Type, class UInt16Type, class Int32Type, class UInt32Type, class Int64Type, class UInt64Type>
+template <class Int16Type, class UInt16Type, class Int32Type, class UInt32Type, class Int64Type, class UInt64Type, class UInt48Type_t>
 class EndianHelpers : private StaticOnly
 {
 
@@ -89,6 +91,21 @@ private:
         return UInt64Type::read_from(input, out);
     }
 
+    static inline bool read_one(rseq_t& input, UInt48Type& out)
+    {
+        return UInt48Type_t::read_from(input, out);
+    }
+
+    static inline bool read_one(rseq_t& input, double& out)
+    {
+        return DoubleFloat::read_from(input, out);
+    }
+
+    static inline bool read_one(rseq_t& input, float& out)
+    {
+        return SingleFloat::read_from(input, out);
+    }
+
     static inline bool write(wseq_t& dest)
     {
         return true;
@@ -127,6 +144,21 @@ private:
     static inline bool write_one(wseq_t& dest, const uint64_t& value)
     {
         return UInt64Type::write_to(dest, value);
+    }
+
+    static inline bool write_one(wseq_t& dest, const UInt48Type& value)
+    {
+        return UInt48Type_t::write_to(dest, value);
+    }
+
+    static inline bool write_one(wseq_t& dest, const double& value)
+    {
+        return DoubleFloat::write_to(dest, value);
+    }
+
+    static inline bool write_one(wseq_t& dest, const float& value)
+    {
+        return SingleFloat::write_to(dest, value);
     }
 };
 

@@ -39,7 +39,7 @@ typedef Bit64<uint64_t, 0, 1, 2, 3, 4, 5, 6, 7>		UInt64;
 
 typedef UBit48<	0, 1, 2, 3, 4, 5>					UInt48;
 
-typedef EndianHelpers<Int16, UInt16, Int32, UInt32, Int64, UInt64>	LittleEndian;
+typedef EndianHelpers<Int16, UInt16, Int32, UInt32, Int64, UInt64, UInt48>	LittleEndian;
 
 }
 

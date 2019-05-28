@@ -58,13 +58,13 @@ public:
 
     inline T& operator[](W index)
     {
-        assert(index < m_length);
+        assert(index < this->m_length);
         return m_buffer[index];
     }
 
     inline const T& operator[](W index) const
     {
-        assert(index < m_length);
+        assert(index < this->m_length);
         return m_buffer[index];
     }
 

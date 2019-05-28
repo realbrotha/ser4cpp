@@ -1,6 +1,9 @@
 set(ser4cpp_public_headers
+    ./ser4cpp/container/Array.h
+    ./ser4cpp/container/ArrayView.h
     ./ser4cpp/container/Buffer.h
-    ./ser4cpp/container/HasLength.h    
+    ./ser4cpp/container/HasLength.h
+    ./ser4cpp/container/Pair.h
     ./ser4cpp/container/RSeq.h
     ./ser4cpp/container/SequenceTypes.h
     ./ser4cpp/container/Settable.h

@@ -58,23 +58,23 @@ public:
 
     ArrayView<T, W> to_view() const
     {
-        return ArrayView<T, W>(buffer, m_length);
+        return ArrayView<T, W>(buffer, this->m_length);
     }
 
     inline bool contains(W index) const
     {
-        return index < m_length;
+        return index < this->m_length;
     }
 
     inline T& operator[](W index)
     {
-        assert(index < m_length);
+        assert(index < this->m_length);
         return buffer[index];
     }
 
     const T& operator[](W index) const
     {
-        assert(index < m_length);
+        assert(index < this->m_length);
         return buffer[index];
     }
 

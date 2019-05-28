@@ -51,7 +51,7 @@ public:
 
     bool pop(T& output)
     {
-        if (valueIsSet)
+        if (value_is_set)
         {
             value_is_set = false;
             output = value;

@@ -27,7 +27,8 @@
 
 #include "ser4cpp/container/HasLength.h"
 
-#include <assert.h>
+#include <cassert>
+#include <functional>
 
 namespace ser4cpp
 {
@@ -67,6 +68,15 @@ public:
         assert(index < this->m_length);
         return m_buffer[index];
     }
+
+    template<class Action> void foreach(const Action& action)
+    {
+        for (W i = 0; i < this->m_length; ++i)
+        {
+            action(m_buffer[i]);
+        }
+    }
+
 
 private:
     T* m_buffer;

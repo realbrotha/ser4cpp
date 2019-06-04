@@ -25,22 +25,29 @@
 #ifndef SER4CPP_LITTLEENDIAN_H
 #define SER4CPP_LITTLEENDIAN_H
 
-#include "ser4cpp/serialization/EndianHelpers.h"
+#include "ser4cpp/serialization/DoubleFloat.h"
+#include "ser4cpp/serialization/SerializationTemplates.h"
+#include "ser4cpp/serialization/SingleFloat.h"
 
 namespace ser4cpp
 {
 
-typedef Bit16<int16_t, 0, 1>						Int16;
-typedef Bit16<uint16_t, 0, 1>						UInt16;
-typedef Bit32<int32_t, 0, 1, 2, 3>					Int32;
-typedef Bit32<uint32_t, 0, 1, 2, 3>					UInt32;
-typedef Bit64<int64_t, 0, 1, 2, 3, 4, 5, 6, 7>		Int64;
-typedef Bit64<uint64_t, 0, 1, 2, 3, 4, 5, 6, 7>		UInt64;
+using Int16  = Bit16<int16_t, 0, 1>;
+using UInt16 = Bit16<uint16_t, 0, 1>;
+using Int32  = Bit32<int32_t, 0, 1, 2, 3>;
+using UInt32 = Bit32<uint32_t, 0, 1, 2, 3>;
+using Int64  = Bit64<int64_t, 0, 1, 2, 3, 4, 5, 6, 7>;
+using UInt64 = Bit64<uint64_t, 0, 1, 2, 3, 4, 5, 6, 7>;
 
-typedef UBit48<	0, 1, 2, 3, 4, 5>					UInt48;
+using UInt48 = UBit48<0, 1, 2, 3, 4, 5>;
 
-typedef EndianHelpers<Int16, UInt16, Int32, UInt32, Int64, UInt64, UInt48>	LittleEndian;
+}
 
+#include "ser4cpp/serialization/EndianHelpers.h"
+
+namespace ser4cpp
+{
+    using LittleEndian = EndianHelpers;
 }
 
 #endif

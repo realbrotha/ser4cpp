@@ -33,6 +33,8 @@
 namespace ser4cpp
 {
 
+namespace custom_serializers {}
+
 template <class Int16Type, class UInt16Type, class Int32Type, class UInt32Type, class Int64Type, class UInt64Type, class UInt48Type_t>
 class EndianHelpers : private StaticOnly
 {
@@ -106,6 +108,12 @@ private:
         return SingleFloat::read_from(input, out);
     }
 
+    template<typename T>
+    static inline bool read_one(rseq_t& input, T& out)
+    {
+        return custom_serializers::read_one(input, out);
+    }
+
     static inline bool write(wseq_t& dest)
     {
         return true;
@@ -159,6 +167,12 @@ private:
     static inline bool write_one(wseq_t& dest, const float& value)
     {
         return SingleFloat::write_to(dest, value);
+    }
+
+    template<typename T>
+    static inline bool write_one(wseq_t& dest, const T& value)
+    {
+        return custom_serializers::write_one(dest, value);
     }
 };
 

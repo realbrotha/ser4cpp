@@ -45,9 +45,9 @@ public:
 
     Array() : HasLength<W>(0), buffer(nullptr) {}
 
-    Array(const Array& copy) : HasLength<W>(copy.Size()), buffer(new T[copy.size()])
+    Array(const Array& copy) : HasLength<W>(copy.length()), buffer(new T[copy.length()])
     {
-        for (W i = 0; i < copy.size(); ++i)
+        for (W i = 0; i < copy.length(); ++i)
             buffer[i] = copy.buffer[i];
     }
 

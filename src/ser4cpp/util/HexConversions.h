@@ -116,7 +116,7 @@ public:
             throw std::invalid_argument(hex);
         }
 
-        const auto num_bytes = static_cast<uint32_t>(copy.size() / 2);
+        const auto num_bytes = copy.size() / 2;
 
         auto buffer = std::make_unique<Buffer>(num_bytes);
 

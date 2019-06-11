@@ -58,7 +58,7 @@ public:
         return wseq_t(this->buffer, LENGTH);
     }
 
-    inline wseq_t as_wseq(uint32_t max_size)
+    inline wseq_t as_wseq(size_t max_size)
     {
         return wseq_t(this->buffer, ser4cpp::min(LENGTH, max_size));
     }

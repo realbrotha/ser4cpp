@@ -86,13 +86,13 @@ public:
         }
     }
 
-    WSeq skip(uint32_t count) const
+    WSeq skip(size_t count) const
     {
         const auto num = ser4cpp::min(count, this->m_length);
         return WSeq(this->buffer_ + num, this->m_length - num);
     }
 
-    WSeq take(uint32_t count) const
+    WSeq take(size_t count) const
     {
         return WSeq(this->buffer_, ser4cpp::min(this->m_length, count));
     }

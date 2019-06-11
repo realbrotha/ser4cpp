@@ -38,17 +38,17 @@ public:
     typedef bool (*ReadFunc)(rseq_t& buffer, T& output);
     typedef bool (*WriteFunc)(const T& value, wseq_t& buffer);
 
-    Serializer() : _size(0), pReadFunc(nullptr), pWriteFunc(nullptr) {}
+	Serializer() = default;
 
-    Serializer(uint32_t size, ReadFunc pReadFunc, WriteFunc pWriteFunc)
-        : _size(size), pReadFunc(pReadFunc), pWriteFunc(pWriteFunc)
+    Serializer(size_t size, ReadFunc read_func, WriteFunc write_func)
+        : size(size), read_func(read_func), write_func(write_func)
     {
     }
 
     /**
      * @return The size (in bytes) required for every call to read/write
      */
-    uint32_t size() const
+    size_t size() const
     {
         return _size;
     }
@@ -58,7 +58,7 @@ public:
      */
     bool read(rseq_t& buffer, T& output) const
     {
-        return (*pReadFunc)(buffer, output);
+        return (*read_func)(buffer, output);
     }
 
     /**
@@ -66,13 +66,13 @@ public:
      */
     bool write(const T& value, wseq_t& buffer) const
     {
-        return (*pWriteFunc)(value, buffer);
+        return (*write_func)(value, buffer);
     }
 
 private:
-    uint32_t _size;
-    ReadFunc pReadFunc;
-    WriteFunc pWriteFunc;
+	size_t size = 0;
+	ReadFunc read_func = nullptr;
+    WriteFunc write_func = nullptr;
 };
 
 }

@@ -30,8 +30,8 @@
 namespace ser4cpp
 {
 
-typedef RSeq<uint32_t> rseq_t;
-typedef WSeq<uint32_t> wseq_t;
+typedef RSeq<size_t> rseq_t;
+typedef WSeq<size_t> wseq_t;
 
 }
 

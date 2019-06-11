@@ -33,7 +33,7 @@
 namespace ser4cpp
 {
 
-class Buffer : public HasLength<uint32_t>, private Uncopyable
+class Buffer : public HasLength<size_t>, private Uncopyable
 {
 public:
     Buffer() : HasLength(0)
@@ -41,7 +41,7 @@ public:
 
     ~Buffer() = default;
 
-    explicit Buffer(uint32_t length) :
+    explicit Buffer(size_t length) :
         HasLength(length),
         bytes(std::make_unique<uint8_t[]>(length))
     {}

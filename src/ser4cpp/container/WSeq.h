@@ -52,7 +52,7 @@ public:
     WSeq()
     {}
 
-    WSeq(uint8_t* buffer, uint32_t length) : HasLength<L>(length), buffer_(buffer)
+    WSeq(uint8_t* buffer, L length) : HasLength<L>(length), buffer_(buffer)
     {}
 
     void set_all_to(uint8_t value)

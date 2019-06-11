@@ -32,7 +32,7 @@ using namespace ser4cpp;
 
 TEST_CASE(SUITE("Static buffers can be copied"))
 {
-    StaticBuffer<uint8_t, 4> buffer;
+    StaticBuffer<4> buffer;
 
     {
         auto dest = buffer.as_wseq();
@@ -42,7 +42,7 @@ TEST_CASE(SUITE("Static buffers can be copied"))
         dest[3] = 0xEF;
     }
 
-    StaticBuffer<uint8_t, 4> copy(buffer);
+    StaticBuffer<4> copy(buffer);
     auto view = copy.as_seq();
 
     REQUIRE(view[0] == 0xDE);
@@ -53,7 +53,7 @@ TEST_CASE(SUITE("Static buffers can be copied"))
 
 TEST_CASE(SUITE("Static buffers can be assigned"))
 {
-    StaticBuffer<uint8_t, 4> buffer;
+    StaticBuffer<4> buffer;
     auto dest = buffer.as_wseq();
 
     dest[0] = 0xDE;
@@ -61,7 +61,7 @@ TEST_CASE(SUITE("Static buffers can be assigned"))
     dest[2] = 0xBE;
     dest[3] = 0xEF;
 
-    StaticBuffer<uint8_t, 4> copy;
+    StaticBuffer<4> copy;
     copy = buffer;
     auto view = copy.as_seq();
     REQUIRE(view[0] == 0xDE);

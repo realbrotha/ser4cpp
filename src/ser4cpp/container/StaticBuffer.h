@@ -34,21 +34,19 @@
 
 namespace ser4cpp
 {
-
-template <class T, T LENGTH>
+template <size_t LENGTH>
 class StaticBuffer final
 {
-    static_assert(!std::numeric_limits<T>::is_signed&& std::numeric_limits<T>::is_integer, "Must be an unsigned integer");
 
 public:
-    StaticBuffer() {}
+	StaticBuffer() = default;
 
-    inline RSeq<T> as_seq() const
+    inline rseq_t as_seq() const
     {
-        return RSeq<T>(this->buffer, LENGTH);
+        return rseq_t(this->buffer, LENGTH);
     }
 
-    inline RSeq<T> as_seq(T max_size) const
+    inline rseq_t as_seq(size_t max_size) const
     {
         return this->as_seq().take(max_size);
     }
@@ -63,7 +61,7 @@ public:
         return wseq_t(this->buffer, ser4cpp::min(LENGTH, max_size));
     }
 
-    inline T length() const
+    inline size_t length() const
     {
         return LENGTH;
     }

@@ -132,7 +132,7 @@ public:
             buffer->as_wslice()[index] = static_cast<uint8_t>(val);
         }
 
-        return std::move(buffer);
+        return buffer;
     }
 
 private:

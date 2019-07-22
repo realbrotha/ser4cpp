@@ -39,6 +39,8 @@ using UInt32 = Bit32<uint32_t, 3, 2, 1, 0>;
 using Int64 = Bit64<int64_t, 7, 6, 5, 4, 3, 2, 1, 0>;
 using UInt64 = Bit64<uint64_t, 7, 6, 5, 4, 3, 2, 1, 0>;
 
+using UInt48 = UBit48<5, 4, 3, 2, 1, 0>;
+
 }
 
 #include "ser4cpp/serialization/EndianHelpers.h"

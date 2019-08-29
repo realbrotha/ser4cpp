@@ -74,6 +74,7 @@ TEST_CASE(SUITE("Float memory byte order is IEEE 754"))
 
 TEST_CASE(SUITE("DoubleFloatSerialization"))
 {
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 00 00", 0.0);
     TestFloatParsing<ser4cpp::DoubleFloat>("0A 52 84 2F C7 2B A2 C0", -2.3258890344E3);
     TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 64 89 67 41", 12340000.0);
     TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 34 C0", -20.0);
@@ -91,6 +92,7 @@ TEST_CASE(SUITE("DoubleFloatSerialization"))
 
 TEST_CASE(SUITE("SingleFloatSerialization"))
 {
+    TestFloatParsing<ser4cpp::SingleFloat>("00 00 00 00", 0.0f);
     TestFloatParsing<ser4cpp::SingleFloat>("20 4B 3C 4B", 12340000.0f);
     TestFloatParsing<ser4cpp::SingleFloat>("6D C9 27 9B", -13.879E-23f);
     TestFloatParsing<ser4cpp::SingleFloat>("00 00 A0 C1", -20.0f);

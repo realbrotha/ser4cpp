@@ -25,9 +25,7 @@
 #ifndef SER4CPP_BIGENDIAN_H
 #define SER4CPP_BIGENDIAN_H
 
-#include "ser4cpp/serialization/DoubleFloat.h"
 #include "ser4cpp/serialization/SerializationTemplates.h"
-#include "ser4cpp/serialization/SingleFloat.h"
 
 namespace ser4cpp
 {
@@ -43,6 +41,8 @@ using UInt48 = UBit48<5, 4, 3, 2, 1, 0>;
 
 }
 
+#include "ser4cpp/serialization/DoubleFloat.h"
+#include "ser4cpp/serialization/SingleFloat.h"
 #include "ser4cpp/serialization/EndianHelpers.h"
 
 namespace ser4cpp

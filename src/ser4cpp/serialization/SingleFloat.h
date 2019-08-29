@@ -29,6 +29,7 @@
 #include "ser4cpp/container/SequenceTypes.h"
 
 #include <cstddef>
+#include <limits>
 
 namespace ser4cpp
 {
@@ -40,61 +41,115 @@ public:
 
     static bool read_from(rseq_t& input, float& out)
     {
-        if (input.length() < size) return false;
-
-        out = read(input);
-        input.advance(size);
-        return true;
+        uint32_t value;
+        if(UInt32::read_from(input, value))
+        {
+            out = to_float32(value);
+            return true;
+        }
+        
+        return false;
     }
 
     static bool write_to(wseq_t& dest, float value)
     {
         if (dest.length() < size) return false;
 
-        write(dest, value);
-        dest.advance(size);
-        return true;
+        const auto uint32_value = to_uint32(value);
+        return UInt32::write_to(dest, uint32_value);
+    }
+
+    static float to_float32(const uint32_t value)
+    {
+        // Extract the required values
+        bool sign = (value & 0x80000000) != 0;
+        uint8_t exponent = static_cast<uint8_t>((value >> 23) & 0xFF);
+        uint32_t mantissa = value & 0x7FFFFF;
+
+        // Check special cases
+        if(exponent == 0xFF)
+        {
+            if(mantissa != 0)
+            {
+                return std::numeric_limits<float>::quiet_NaN();
+            }
+            else
+            {
+                if(!sign)
+                {
+                    return std::numeric_limits<float>::infinity();
+                }
+                else
+                {
+                    return -std::numeric_limits<float>::infinity();
+                }
+                
+            }
+        }
+        if(exponent == 0 && mantissa == 0)
+        {
+            return 0.0f;
+        }
+
+        // Build the actual value
+        auto weighted_mantissa = static_cast<float>(mantissa)/(uint32_t{1} << 23);
+        float result;
+        if(exponent == 0)
+        {
+            result = std::ldexp(weighted_mantissa, 2 - (uint16_t{1} << 8));
+        }
+        else
+        {
+            result = std::ldexp(1.0f + weighted_mantissa, exponent - 127);
+        }
+
+        // Adjust the sign
+        if(sign)
+        {
+            result = -result;
+        }
+
+        return result;
+    }
+
+    static uint32_t to_uint32(const float value)
+    {
+        uint32_t encoded_value{0};
+
+        if (std::isnan(value))
+        {
+            // NaN has all exponent bit set to 1, and mantissa with a least a 1. Sign bit is ignored.
+            // Here, I use x86 qNaN (because libiec61850 simply cast the value into a double)
+            encoded_value = 0x7F800001;
+        }
+        if (std::isinf(value))
+        {
+            // Infinite has all exponent bit set to 1, and mantissa filled with zeroes. Sign bit determines
+            // which infinite it represents
+            encoded_value = 0x7F800000;
+        }
+        else
+        {
+            int integral_part;
+            float fraction_part = std::frexp(std::abs(value), &integral_part);
+
+            uint16_t exponent = integral_part + 126;
+            encoded_value |= (static_cast<uint32_t>(exponent) & 0xFF) << 23;
+            encoded_value |= static_cast<uint32_t>(fraction_part * (uint32_t{1} << 24)) & 0x007FFFFF;
+        }
+
+        if (std::signbit(value))
+        {
+            encoded_value |= uint32_t{1} << 31;
+        }
+
+        return encoded_value;
     }
 
     typedef float type_t;
     static constexpr std::size_t size = sizeof(float);
     static constexpr float max_value = std::numeric_limits<float>::max();
     static constexpr float min_value = -std::numeric_limits<float>::max();
-
-private:
-    union SingleFloatUnion
-    {
-        uint8_t bytes[4];
-        float value;
-    };
-
-    static float read(const uint8_t* data)
-    {
-        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
-        {
-            SingleFloatUnion x = {{ data[0], data[1], data[2], data[3] }};
-            return x.value;
-        }
-        else
-        {
-            SingleFloatUnion x = {{ data[3], data[2], data[1], data[0] }};
-            return x.value;
-        }
-    }
-
-    static void write(uint8_t* dest, float value)
-    {
-        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
-        {
-            memcpy(dest, &value, size);
-        }
-        else
-        {
-            auto data = reinterpret_cast<uint8_t*>(&value);
-            uint8_t bytes[4] = { data[3], data[2], data[1], data[0] };
-            memcpy(dest, bytes, size);
-        }
-    }
 };
 
 }

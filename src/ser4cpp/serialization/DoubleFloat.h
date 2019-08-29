@@ -25,13 +25,10 @@
 #ifndef SER4CPP_DOUBLE_FLOAT_H
 #define SER4CPP_DOUBLE_FLOAT_H
 
-#include "ser4cpp/container/SequenceTypes.h"
-#include "ser4cpp/serialization/DoubleFloat.h"
-#include "ser4cpp/serialization/FloatByteOrder.h"
 #include "ser4cpp/util/Uncopyable.h"
+#include "ser4cpp/container/SequenceTypes.h"
 
 #include <cstddef>
-#include <cstring>
 #include <limits>
 
 namespace ser4cpp
@@ -44,61 +41,115 @@ public:
 
     static bool read_from(rseq_t& input, double& out)
     {
-        if (input.length() < size) return false;
-
-        out = read(input);
-        input.advance(size);
-        return true;
+        uint64_t value;
+        if(UInt64::read_from(input, value))
+        {
+            out = to_double(value);
+            return true;
+        }
+        
+        return false;
     }
     
     static bool write_to(wseq_t& dest, double value)
     {
         if (dest.length() < size) return false;
 
-        write(dest, value);
-        dest.advance(size);
-        return true;
+        const auto uint64_value = to_uint64(value);
+        return UInt64::write_to(dest, uint64_value);
+    }
+
+    static double to_double(const uint64_t value)
+    {
+        // Extract the required values
+        bool sign = (value & 0x8000000000000000) != 0;
+        uint16_t exponent = static_cast<uint16_t>((value >> 52) & 0x7FF);
+        uint64_t mantissa = value & 0xFFFFFFFFFFFFF;
+
+        // Check special cases
+        if(exponent == 0x7FF)
+        {
+            if(mantissa != 0)
+            {
+                return std::numeric_limits<double>::quiet_NaN();
+            }
+            else
+            {
+                if(!sign)
+                {
+                    return std::numeric_limits<double>::infinity();
+                }
+                else
+                {
+                    return -std::numeric_limits<double>::infinity();
+                }
+                
+            }
+        }
+        if(exponent == 0 && mantissa == 0)
+        {
+            return 0.0;
+        }
+
+        // Build the actual value
+        auto weighted_mantissa = static_cast<double>(mantissa)/(uint64_t{1} << 52);
+        double result;
+        if(exponent == 0)
+        {
+            result = std::ldexp(weighted_mantissa, 2 - (uint16_t{1} << 11));
+        }
+        else
+        {
+            result = std::ldexp(1.0 + weighted_mantissa, exponent - 1023);
+        }
+
+        // Adjust the sign
+        if(sign)
+        {
+            result = -result;
+        }
+
+        return result;
+    }
+
+    static uint64_t to_uint64(const double value)
+    {
+        uint64_t encoded_value{0};
+
+        if (std::isnan(value))
+        {
+            // NaN has all exponent bit set to 1, and mantissa with a least a 1. Sign bit is ignored.
+            // Here, I use x86 qNaN (because libiec61850 simply cast the value into a double)
+            encoded_value = 0x7FF8000000000001;
+        }
+        if (std::isinf(value))
+        {
+            // Infinite has all exponent bit set to 1, and mantissa filled with zeroes. Sign bit determines
+            // which infinite it represents
+            encoded_value = 0x7FF0000000000000;
+        }
+        else
+        {
+            int integral_part;
+            double fraction_part = std::frexp(std::abs(value), &integral_part);
+
+            uint16_t exponent = integral_part + 1022;
+            encoded_value |= (static_cast<uint64_t>(exponent) & 0x7FF) << 52;
+            encoded_value |= static_cast<uint64_t>(fraction_part * (uint64_t{1} << 53)) & 0xFFFFFFFFFFFFF;
+        }
+
+        if (std::signbit(value))
+        {
+            encoded_value |= uint64_t{1} << 63;
+        }
+
+        return encoded_value;
     }
 
     typedef double type_t;
     static constexpr std::size_t size = sizeof(double);
     static constexpr double max_value = std::numeric_limits<double>::max();
     static constexpr double min_value = -std::numeric_limits<double>::max();
-
-private:
-    union DoubleFloatUnion
-    {
-        uint8_t bytes[8];
-        double value;
-    };
-
-    static double read(const uint8_t* data)
-    {
-        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
-        {
-            DoubleFloatUnion x = {{ data[0], data[1], data[2], data[3], data[4], data[5], data[6], data[7] }};
-            return x.value;
-        }
-        else
-        {
-            DoubleFloatUnion x = {{ data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0] }};
-            return x.value;
-        }
-    }
-
-    static void write(uint8_t* dest, double value)
-    {
-        if (FloatByteOrder::order() == FloatByteOrder::Value::normal)
-        {
-            memcpy(dest, &value, size);
-        }
-        else
-        {
-            auto data = reinterpret_cast<uint8_t*>(&value);
-            uint8_t bytes[8] = { data[7], data[6], data[5], data[4], data[3], data[2], data[1], data[0] };
-            memcpy(dest, bytes, size);
-        }
-    }
 };
 
 }

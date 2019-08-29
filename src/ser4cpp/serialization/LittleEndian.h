@@ -25,9 +25,7 @@
 #ifndef SER4CPP_LITTLEENDIAN_H
 #define SER4CPP_LITTLEENDIAN_H
 
-#include "ser4cpp/serialization/DoubleFloat.h"
 #include "ser4cpp/serialization/SerializationTemplates.h"
-#include "ser4cpp/serialization/SingleFloat.h"
 
 namespace ser4cpp
 {
@@ -43,6 +41,8 @@ using UInt48 = UBit48<0, 1, 2, 3, 4, 5>;
 
 }
 
+#include "ser4cpp/serialization/DoubleFloat.h"
+#include "ser4cpp/serialization/SingleFloat.h"
 #include "ser4cpp/serialization/EndianHelpers.h"
 
 namespace ser4cpp

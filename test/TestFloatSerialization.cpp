@@ -25,33 +25,44 @@
 #include "catch.hpp"
 
 #include "ser4cpp/container/Buffer.h"
-#include "ser4cpp/serialization/DoubleFloat.h"
+#include "ser4cpp/serialization/LittleEndian.h"
 #include "ser4cpp/serialization/FloatByteOrder.h"
-#include "ser4cpp/serialization/SingleFloat.h"
 #include "ser4cpp/util/HexConversions.h"
 
 using namespace ser4cpp;
 using namespace std;
 
 template <class T>
-bool TestFloatParsing(std::string expected_hex, typename T::type_t value)
+void TestFloatParsing(std::string expected_hex, typename T::type_t value, bool check_nan = false)
 {
+    // Serialization test
     Buffer buffer(T::size);
-
     auto dest = buffer.as_wslice();
-    if (!T::write_to(dest, value)) return false;
 
-    if(dest.is_not_empty()) return false;
+    CHECK(T::write_to(dest, value));
+    CHECK(dest.is_empty());
 
     const auto hex = HexConversions::to_hex(buffer.as_rslice());
+    CHECK(hex == expected_hex);
 
-    if (expected_hex != hex) return false;
-
+    // Deserialization test
     typename T::type_t read_value;
 
-    auto input = buffer.as_rslice();
+    auto expected_bytes = HexConversions::from_hex(expected_hex);
+    auto input = expected_bytes->as_rslice();
 
-    return T::read_from(input, read_value) && input.is_empty() && (value == read_value);
+    CHECK(T::read_from(input, read_value));
+    CHECK(input.is_empty());
+
+    if(!check_nan)
+    {
+        CHECK(value == read_value);
+    }
+    else
+    {
+        // Two NaN values are NEVER equal, even if they have the same representation
+        CHECK(std::isnan(read_value));
+    }
 }
 
 #define SUITE(name) "FloatSerializationTestSuite - " name
@@ -63,16 +74,32 @@ TEST_CASE(SUITE("Float memory byte order is IEEE 754"))
 
 TEST_CASE(SUITE("DoubleFloatSerialization"))
 {
-    REQUIRE(TestFloatParsing<ser4cpp::DoubleFloat>("0A 52 84 2F C7 2B A2 C0", -2.3258890344E3));
-    REQUIRE(TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 64 89 67 41", 12340000.0));
-    REQUIRE(TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 34 C0", -20.0));
-    REQUIRE(TestFloatParsing<ser4cpp::DoubleFloat>("8F 81 9C 95 2D F9 64 BB", -13.879E-23));
-    REQUIRE(TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 59 40", 100.0));
+    TestFloatParsing<ser4cpp::DoubleFloat>("0A 52 84 2F C7 2B A2 C0", -2.3258890344E3);
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 64 89 67 41", 12340000.0);
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 34 C0", -20.0);
+    TestFloatParsing<ser4cpp::DoubleFloat>("8F 81 9C 95 2D F9 64 BB", -13.879E-23);
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 59 40", 100.0);
+
+    // These tests were copied from goose-cpp, but with the bytes reversed (because GOOSE is big endian)
+    TestFloatParsing<ser4cpp::DoubleFloat>("9A 99 99 99 99 19 45 40", 42.2);
+    TestFloatParsing<ser4cpp::DoubleFloat>("66 66 66 66 66 26 53 C0", -76.6);
+    TestFloatParsing<ser4cpp::DoubleFloat>("F3 8E 53 74 24 97 BF 3F", 0.1234);
+    TestFloatParsing<ser4cpp::DoubleFloat>("01 00 00 00 00 00 F8 7F", std::numeric_limits<double>::quiet_NaN(), true);
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 F0 7F", std::numeric_limits<double>::infinity());
+    TestFloatParsing<ser4cpp::DoubleFloat>("00 00 00 00 00 00 F0 FF", -std::numeric_limits<double>::infinity());
 }
 
 TEST_CASE(SUITE("SingleFloatSerialization"))
 {
-    REQUIRE(TestFloatParsing<ser4cpp::SingleFloat>("20 4B 3C 4B", 12340000.0f));
-    REQUIRE(TestFloatParsing<ser4cpp::SingleFloat>("6D C9 27 9B", -13.879E-23f));
-    REQUIRE(TestFloatParsing<ser4cpp::SingleFloat>("00 00 A0 C1", -20.0));
+    TestFloatParsing<ser4cpp::SingleFloat>("20 4B 3C 4B", 12340000.0f);
+    TestFloatParsing<ser4cpp::SingleFloat>("6D C9 27 9B", -13.879E-23f);
+    TestFloatParsing<ser4cpp::SingleFloat>("00 00 A0 C1", -20.0f);
+
+    // These tests were copied from goose-cpp, but with the bytes reversed (because GOOSE is big endian)
+    TestFloatParsing<ser4cpp::SingleFloat>("CD CC 28 42", 42.2f);
+    TestFloatParsing<ser4cpp::SingleFloat>("33 33 99 C2", -76.6f);
+    TestFloatParsing<ser4cpp::SingleFloat>("24 B9 FC 3D", 0.1234f);
+    TestFloatParsing<ser4cpp::SingleFloat>("01 00 80 7F", std::numeric_limits<float>::quiet_NaN(), true);
+    TestFloatParsing<ser4cpp::SingleFloat>("00 00 80 7F", std::numeric_limits<float>::infinity());
+    TestFloatParsing<ser4cpp::SingleFloat>("00 00 80 FF", -std::numeric_limits<float>::infinity());
 }

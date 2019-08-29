@@ -30,6 +30,7 @@
 
 #include <cstddef>
 #include <limits>
+#include <cmath>
 
 namespace ser4cpp
 {

@@ -123,13 +123,13 @@ public:
             // Here, I use x86 qNaN (because libiec61850 simply cast the value into a double)
             encoded_value = 0x7FF8000000000001;
         }
-        if (std::isinf(value))
+        else if (std::isinf(value))
         {
             // Infinite has all exponent bit set to 1, and mantissa filled with zeroes. Sign bit determines
             // which infinite it represents
             encoded_value = 0x7FF0000000000000;
         }
-        else
+        else if (value != 0.0)
         {
             int integral_part;
             double fraction_part = std::frexp(std::abs(value), &integral_part);

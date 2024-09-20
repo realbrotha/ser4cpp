@@ -4722,9 +4722,12 @@ namespace Catch {
 }
 
 #ifdef CATCH_PLATFORM_MAC
-
+  #if defined(__arm64__) || defined(__aarch64__) // ARM architecture
+    #define CATCH_TRAP() __builtin_trap()
+  #elif defined(__i386__) || defined(__x86_64__) // x86 architecture
     #define CATCH_TRAP() __asm__("int $3\n" : : ) /* NOLINT */
 
+#endif
 #elif defined(CATCH_PLATFORM_LINUX)
     // If we can use inline assembler, do it because this allows us to break
     // directly at the location of the failing check instead of breaking inside
